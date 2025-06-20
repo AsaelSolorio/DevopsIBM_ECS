@@ -1,0 +1,16 @@
+# Containerfile for Go Weather Consumer Service
+FROM golang:1.20-alpine AS builder
+
+WORKDIR /app
+COPY go.mod go.sum ./
+#copy env variables
+COPY .env ./.env
+RUN go mod download
+COPY . .
+RUN go build -o weather_consumer ./cmd/weather_consumer/main.go
+
+FROM alpine:latest
+WORKDIR /app
+COPY .env ./.env
+COPY --from=builder /app/weather_consumer ./weather_consumer
+CMD ["./weather_consumer"]

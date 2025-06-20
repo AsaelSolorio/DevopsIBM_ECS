@@ -1,0 +1,50 @@
+# Containerfile for Go UI Service
+# This service provides a web interface to display weather data and forecasts.
+
+# ---- Build stage ----
+FROM golang:1.20-alpine AS builder
+
+# Set up the working directory inside the container
+WORKDIR /app
+
+# Copy go.mod and go.sum from project root (because context is root!)
+COPY go.mod go.sum ./
+
+# Copy env variables (optional, but okay)
+COPY .env ./.env
+
+# Download dependencies
+RUN go mod download
+
+# Copy the actual source folders preserving structure
+COPY cmd ./cmd
+COPY pkg ./pkg
+
+# Build using correct paths: use module structure
+RUN go build -o ui ./cmd/UI/main.go
+
+# ---- Final stage ----
+FROM alpine:latest
+
+WORKDIR /app
+
+# Install curl (required for /wait dependencies)
+RUN apk add --no-cache curl bash
+
+# Add docker-compose-wait tool to wait for forecaster-service
+ENV WAIT_VERSION 2.7.2
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/${WAIT_VERSION}/wait /wait
+RUN chmod +x /wait
+
+# Copy the built binary
+COPY --from=builder /app/ui .
+COPY .env ./.env
+
+# Copy static assets and templates (from root context)
+COPY static ./static
+COPY templates ./templates
+
+EXPOSE 8000
+
+# Use /wait to wait for forecaster-service:5000 before starting UI binary
+CMD ["sh", "-c", "/wait && ./ui"]

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather Forecast</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <!-- REMOVED ALL JAVASCRIPT -->
+</head>
+<body>
+  <div class="container">
+    <h1>Weather Forecast</h1>
+
+    <form action="/fetch" method="POST" class="weather-form">
+      <div class="form-group">
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" placeholder="Enter city name" required />
+      </div>
+      <div class="form-group">
+        <label for="country">Country Code:</label>
+        <input type="text" id="country" name="country" placeholder="Enter country code (e.g., MX)" required />
+      </div>
+      <button type="submit" class="btn">Fetch Weather</button>
+    </form>
+
+    {{ if .weather }}
+    <div id="weather-section">
+      <h2>Current Weather</h2>
+      <p><strong>City:</strong> {{ .weather.City }}</p>
+      <p><strong>Country:</strong> {{ .weather.Country }}</p>
+      <p><strong>Max Temperature:</strong> {{ .weather.TemperatureMax }}°C</p>
+      <p><strong>Min Temperature:</strong> {{ .weather.TemperatureMin }}°C</p>
+      <p><strong>Humidity:</strong> {{ .weather.Humidity }}%</p>
+    </div>
+    {{ end }}
+
+    <div id="forecast-section">
+      <h2>Guadalajara´s Forecast for Tomorrow</h2>
+      {{ if .forecast }}
+      <!-- Ensure these match your Go struct EXACTLY -->
+      <p><strong>Date:</strong> {{ .forecast.Date }}</p>
+      <p><strong>Temperature:</strong> {{ .forecast.ForecastTemp }}°C</p>
+      <p><strong>Lower Bound:</strong> {{ .forecast.ForecastTempLower }}°C</p>
+      <p><strong>Upper Bound:</strong> {{ .forecast.ForecastTempUpper }}°C</p>
+      {{ else }}
+      <p>Loading forecast...</p>
+      {{ end }}
+    </div>
+  </div>
+</body>
+</html>
