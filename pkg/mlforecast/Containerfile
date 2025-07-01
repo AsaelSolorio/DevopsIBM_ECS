@@ -3,7 +3,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 COPY pkg/mlforecast/mlForecast.py ./mlForecast.py
-RUN apt-get update && apt-get install -y libpq-dev
+RUN apt-get update && apt-get install -y libpq-dev curl
+
 RUN pip install fastapi uvicorn scikit-learn pandas psycopg python-dotenv psycopg_binary
 EXPOSE 5000
 CMD ["uvicorn", "mlForecast:app", "--host", "0.0.0.0", "--port", "5000"]

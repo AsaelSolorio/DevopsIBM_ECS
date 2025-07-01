@@ -102,8 +102,13 @@ func fetchWeatherData(cityName, countryCode string) (*WeatherData, error) {
 
 // Fetch forecast data from FastAPI server
 func fetchForecastData() ([]ForecastData, error) {
-	log.Println("Fetching forecast from forecaster-service...")
-	resp, err := http.Get("http://forecaster-service:5000/forecast")
+	forecasterAPIURL := os.Getenv("FORECASTER_API_URL")
+	if forecasterAPIURL == "" {
+		log.Fatal("FORECASTER_API_URL environment variable is not set")
+	}
+
+	log.Printf("Fetching forecast from %s...", forecasterAPIURL)
+	resp, err := http.Get(fmt.Sprintf("%s/forecast", forecasterAPIURL))
 	if err != nil {
 		return nil, err
 	}
@@ -125,8 +130,13 @@ func fetchForecastData() ([]ForecastData, error) {
 
 // Update fetchForecastData to fetch the latest forecast item directly
 func fetchLatestForecast() (*ForecastData, error) {
+	forecasterAPIURL := os.Getenv("FORECASTER_API_URL_LATEST")
+	if forecasterAPIURL == "" {
+		log.Fatal("FORECASTER_API_URL environment variable is not set")
+	}
+
 	log.Println("Fetching latest forecast from forecaster-service...")
-	resp, err := http.Get("http://forecaster-service:5000/forecast/latest")
+	resp, err := http.Get(fmt.Sprintf("%s/forecast/latest", forecasterAPIURL))
 	if err != nil || resp.StatusCode != http.StatusOK {
 		log.Printf("Error fetching latest forecast or endpoint returned %d. Falling back to all forecasts.", resp.StatusCode)
 		forecasts, err := fetchForecastData()
@@ -216,9 +226,15 @@ func RunUI() {
 	}
 	r.LoadHTMLGlob(templatePath)
 
+	// ✅ Health check endpoint
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+		})
+	})
+
 	// ✅ Handle root endpoint to fetch forecast data
-	// and pass the latest forecast to the template
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/home", func(c *gin.Context) {
 		latestForecast, err := fetchLatestForecast()
 		if err != nil {
 			log.Printf("Forecast fetch error: %v", err)
@@ -228,9 +244,9 @@ func RunUI() {
 			return
 		}
 
-		log.Printf("DEBUG - Passing latest forecast: %+v", latestForecast) // Verify data
+		log.Printf("DEBUG - Passing latest forecast: %+v", latestForecast)
 		c.HTML(http.StatusOK, "index.html", gin.H{
-			"forecast": latestForecast, // Pass the single forecast struct
+			"forecast": latestForecast,
 		})
 	})
 
@@ -238,6 +254,7 @@ func RunUI() {
 	r.POST("/fetch", func(c *gin.Context) {
 		city := c.PostForm("city")
 		country := c.PostForm("country")
+		log.Printf("Received city: %s, country: %s", city, country)
 
 		weatherData, err := fetchWeatherData(city, country)
 		if err != nil {
@@ -259,7 +276,7 @@ func RunUI() {
 
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"weather":  weatherData,
-			"forecast": latestForecast, // Pass the forecast data
+			"forecast": latestForecast,
 		})
 	})
 

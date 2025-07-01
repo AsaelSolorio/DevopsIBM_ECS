@@ -140,5 +140,9 @@ async def get_latest_forecast():
         return {"error": "No forecast available"}
     return latest_forecast[-1]  # Return the most recent forecast
 
+@app.get("/health_forecast")
+async def health_check():
+    return {"status": "ok from forecast"}
+
 if __name__ == "__main__":
     uvicorn.run("mlForecast:app", host="0.0.0.0", port=5000, reload=True)
