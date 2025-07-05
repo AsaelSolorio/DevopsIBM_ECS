@@ -1,0 +1,50 @@
+version: 0.2
+
+env:
+  variables:
+    ECR_URI: 492664494095.dkr.ecr.us-east-2.amazonaws.com
+    REGION: us-east-2
+
+phases:
+  pre_build:
+    commands:
+      - set -e
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_URI
+
+  build:
+    commands:
+      - set -e
+      - echo Building consumer image...
+      - docker build --platform linux/amd64 -t consumer -f cmd/consumer/Containerfile .
+      - docker tag consumer:latest $ECR_URI/consumer:$CODEBUILD_BUILD_NUMBER
+
+      - echo Building ml-forecast image...
+      - docker build --platform linux/amd64 -t ml-forecast -f pkg/mlforecast/Containerfile .
+      - docker tag ml-forecast:latest $ECR_URI/ml-forecast:$CODEBUILD_BUILD_NUMBER
+
+      - echo Building ui-forecast image...
+      - docker build --platform linux/amd64 -t ui-forecast -f cmd/UI/Containerfile .
+      - docker tag ui-forecast:latest $ECR_URI/ui-forecast:$CODEBUILD_BUILD_NUMBER
+
+  post_build:
+    commands:
+      - set -e
+      - echo Pushing images to ECR...
+      - docker push $ECR_URI/consumer:$CODEBUILD_BUILD_NUMBER
+      - docker push $ECR_URI/ml-forecast:$CODEBUILD_BUILD_NUMBER
+      - docker push $ECR_URI/ui-forecast:$CODEBUILD_BUILD_NUMBER
+
+      - echo Writing image details file...
+      - printf '{"consumer":"%s","ml-forecast":"%s","ui-forecast":"%s"}' \
+        $ECR_URI/consumer:$CODEBUILD_BUILD_NUMBER \
+        $ECR_URI/ml-forecast:$CODEBUILD_BUILD_NUMBER \
+        $ECR_URI/ui-forecast:$CODEBUILD_BUILD_NUMBER > imageDetails.json
+
+artifacts:
+  files:
+    - imageDetails.json
+
+cache:
+  paths:
+    - '/root/.cache/*'
