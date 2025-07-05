@@ -38,7 +38,7 @@ RUN chmod +x /wait
 
 # Copy the built binary
 COPY --from=builder /app/ui .
-COPY .env ./.env
+#COPY .env ./.env
 
 # Copy static assets and templates (from root context)
 COPY static ./static

@@ -11,6 +11,6 @@ RUN go build -o weather_consumer ./cmd/weather_consumer/main.go
 
 FROM alpine:latest
 WORKDIR /app
-COPY .env ./.env
+#COPY .env ./.env
 COPY --from=builder /app/weather_consumer ./weather_consumer
 CMD ["./weather_consumer"]
