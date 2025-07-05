@@ -11,7 +11,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 
 # Copy env variables (optional, but okay)
-COPY .env ./.env
+#COPY .env ./.env
 
 # Download dependencies
 RUN go mod download
