@@ -17,7 +17,7 @@ phases:
       - set -e
       - echo Building consumer image...
       - docker build --platform linux/amd64 -t weather-consumer -f cmd/weather_consumer/Containerfile .
-      - docker tag consumer:latest $ECR_URI/consumer:$CODEBUILD_BUILD_NUMBER
+      - docker tag weather-consumer:latest $ECR_URI/consumer:$CODEBUILD_BUILD_NUMBER
 
       - echo Building ml-forecast image...
       - docker build --platform linux/amd64 -t ml-forecast -f pkg/mlforecast/Containerfile .
