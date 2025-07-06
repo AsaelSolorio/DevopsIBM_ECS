@@ -129,7 +129,7 @@ func RunWeatherConsumer() {
 
 	// Start batch fetch routine
 	go func() {
-		ticker := time.NewTicker(10 * time.Second)
+		ticker := time.NewTicker(20 * time.Second)
 		defer ticker.Stop()
 
 		for {
