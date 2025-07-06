@@ -44,6 +44,7 @@ phases:
 artifacts:
   files:
     - imageDetails.json
+  name: artifacts/imageDetails.json
 
 cache:
   paths:
