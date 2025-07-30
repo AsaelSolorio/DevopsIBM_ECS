@@ -4,6 +4,8 @@ env:
   variables:
     ECR_URI: 492664494095.dkr.ecr.us-east-2.amazonaws.com
     REGION: us-east-2
+    DOCKER_USERNAME: asaelsolorio
+    DOCKER_PASSWORD: Asael788@13
 
 phases:
   pre_build:
@@ -11,6 +13,8 @@ phases:
       - set -e
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_URI
+      - echo Logging in to Docker Hub...
+      - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
 
   build:
     commands:
