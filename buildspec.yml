@@ -5,7 +5,7 @@ env:
     ECR_URI: 492664494095.dkr.ecr.us-east-2.amazonaws.com
     REGION: us-east-2
     DOCKER_USERNAME: asaelsolorio
-    DOCKER_PASSWORD: Asael788@13
+    DOCKER_PASSWORD: Solorio788@13
 
 phases:
   pre_build:
