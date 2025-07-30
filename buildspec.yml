@@ -27,9 +27,9 @@ phases:
       - docker build --platform linux/amd64 -t ml-forecast -f pkg/mlforecast/Containerfile .
       - docker tag ml-forecast:latest $ECR_URI/ml-forecast:$CODEBUILD_BUILD_NUMBER
 
-      - echo Building ui-forecast image...
-      - docker build --platform linux/amd64 -t ui-forecast -f cmd/UI/Containerfile .
-      - docker tag ui-forecast:latest $ECR_URI/ui-forecast:$CODEBUILD_BUILD_NUMBER
+      - echo Building ui-service image...
+      - docker build --platform linux/amd64 -t ui-service -f cmd/UI/Containerfile .
+      - docker tag ui-service:latest $ECR_URI/ui-service:$CODEBUILD_BUILD_NUMBER
 
   post_build:
     commands:
@@ -37,13 +37,13 @@ phases:
       - echo Pushing images to ECR...
       - docker push $ECR_URI/consumer:$CODEBUILD_BUILD_NUMBER
       - docker push $ECR_URI/ml-forecast:$CODEBUILD_BUILD_NUMBER
-      - docker push $ECR_URI/ui-forecast:$CODEBUILD_BUILD_NUMBER
+      - docker push $ECR_URI/ui-service:$CODEBUILD_BUILD_NUMBER
 
       - echo Writing image details file...
-      - printf '{"consumer":"%s","ml-forecast":"%s","ui-forecast":"%s"}' \
+      - printf '{"consumer":"%s","ml-forecast":"%s","ui-service":"%s"}' \
         $ECR_URI/consumer:$CODEBUILD_BUILD_NUMBER \
         $ECR_URI/ml-forecast:$CODEBUILD_BUILD_NUMBER \
-        $ECR_URI/ui-forecast:$CODEBUILD_BUILD_NUMBER > imageDetails.json
+        $ECR_URI/ui-service:$CODEBUILD_BUILD_NUMBER > imageDetails.json
 
 artifacts:
   files:
