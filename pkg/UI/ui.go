@@ -12,7 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/joho/godotenv"
 )
 
 // WeatherData represents the weather data structure
@@ -45,15 +44,22 @@ var (
 
 // Initialize environment variables
 func initEnv() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
 	apiKey = os.Getenv("API_KEY")
 	if apiKey == "" {
 		log.Fatalf("API_KEY environment variable is not set")
 	}
+
+	forecasterAPIURL := os.Getenv("FORECASTER_API_URL")
+	if forecasterAPIURL == "" {
+		log.Fatalf("FORECASTER_API_URL environment variable is not set")
+	}
+
+	forecasterAPIURLLatest := os.Getenv("FORECASTER_API_URL_LATEST")
+	if forecasterAPIURLLatest == "" {
+		log.Fatalf("FORECASTER_API_URL_LATEST environment variable is not set")
+	}
+
+	log.Println("Environment variables successfully loaded")
 }
 
 // Fetch weather data from OpenWeather API
