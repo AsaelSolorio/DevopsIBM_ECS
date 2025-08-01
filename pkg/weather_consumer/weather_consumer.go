@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
@@ -31,19 +30,12 @@ var (
 
 // Initialize environment variables
 func initEnv() {
-	// Load environment variables from .env file
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
-	// Retrieve API_KEY from environment variables
 	apiKey = os.Getenv("API_KEY")
 	if apiKey == "" {
 		log.Fatalf("API_KEY environment variable is not set")
 	}
 
-	log.Println("Environment variables initialized successfully")
+	log.Println("Environment variables successfully loaded")
 }
 
 // Initialize database connection
